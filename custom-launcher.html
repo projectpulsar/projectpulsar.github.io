@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang='en'>
+	<head>
+		<meta charset='utf-8'>
+		<link rel='chrome-webstore-item' href='https://chrome.google.com/webstore/detail/dcbdlfomknhejkfnidjpadgopfaeppgf'>
+		<link href='https://fonts.googleapis.com/css?family=Jura:600' rel='stylesheet' type='text/css'>
+		<link href='https://fonts.googleapis.com/css?family=Syncopate:700' rel='stylesheet' type='text/css'>
+		<script src='https://cdn.jsdelivr.net/jquery/2.2.4/jquery.min.js'></script>
+		<style>
+			html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video, input {
+				margin: 0;
+				padding: 0;
+				border: 0;
+				font-size: 100%;
+				font: inherit;
+				vertical-align: baseline;
+			}
+			
+			html, body {
+				height: 100%;
+			}
+
+			html {
+				font-size: 62.5%;
+			}
+
+			body {
+				text-align: center;
+				background: #F7F7F7;
+			}
+
+			::-webkit-scrollbar { 
+				display: none; 
+			}
+
+			a {
+				text-decoration: none;
+				outline: none;
+				color: inherit;
+			}
+
+			@media only screen and (min-width: 1920px) {
+				html { font-size: 80%; }
+			}
+			
+			#flex-container {
+				width: 100%;
+				height: 100%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.flex-row {
+				width: 100%;
+				margin-bottom: 10%;
+			}
+
+			.flex-item {
+				text-align: center;
+				vertical-align: middle;
+				margin: 2rem;
+				color: grey;
+				font-family: 'Jura';
+				font-size: 3rem;
+			}
+			
+			#logo {
+				font-family: 'Syncopate';
+				font-size: 9rem;
+				color: grey;
+			}
+			
+			#powered {
+				position: fixed;
+				bottom: 0px;
+				right: 0px;
+				color: grey;
+				font-family: 'Jura';
+				font-size: 2rem;
+				margin: 2rem;
+			}
+
+			#launcher-link {
+			    padding: 1rem;
+			    margin: 1rem;
+				background: #ddd;
+				color: #444;
+				text-decoration: none;
+				outline: none;
+				font-family: 'Jura';
+				font-size: 3.5rem;
+				border-radius: 5px;
+				display: inline-block;
+				white-space: nowrap;
+				letter-spacing: 0.4rem;
+			}
+
+			#launcher-link:hover {
+				background: #ccc;
+				color: #333;
+			}
+
+			#installer-link {
+			    padding: 1rem;
+			    margin: 1rem;
+				background: #ddd;
+				color: grey;
+				text-decoration: none;
+				outline: none;
+				font-family: 'Jura';
+				font-size: 3.5rem;
+				border-radius: 5px;
+				display: inline-block;
+				white-space: nowrap;
+			}
+			
+			#installer-link:hover {
+				background: #ccc;
+				color: #707070;
+			}
+		</style>
+	</head>
+	<body>
+		<div id='flex-container'>
+			<div class='flex-row'>
+				<div id='logo' class='flex-item'></div>
+				<div id='action' class='flex-item'></div>
+			</div>
+		</div>		
+		<div id='powered'><a href='https://projectpulsar.github.io'>powered by <span style='font-family: "Syncopate"'>pulsar</span></a></div>
+	</body>
+	<script>
+		function urlParameter( parameter ) {
+			var results = new RegExp( '[\?&]' + parameter + '=([^&#]*)' ).exec( window.location.href );
+			if ( results !== null ) {	
+				return decodeURI( results[1] );
+			} else {
+				return '';
+			}
+		}
+
+		extensionId = 'dcbdlfomknhejkfnidjpadgopfaeppgf';
+		configURL = urlParameter( 'config' );
+
+		$.ajax( configURL, {
+			type : 'GET',
+			cache: false,
+			dataType: 'json' } )
+			.done( function( configuration ) {
+				document.title = configuration.title;
+				$('#logo').html( '<img src=\'' + configuration.logo + '\' style=\'width: ' + configuration.logo_width + '\'></div>' );
+
+				var isChrome = !!window.chrome && !!window.chrome.webstore;
+		
+				if ( !isChrome ) {
+					$('#action').html( 'Chrome browser is needed to enjoy this content' );
+				} else {
+					chrome.runtime.sendMessage(extensionId, { message: 'getPulsarVersion' }, function ( reply ) {
+						if ( typeof reply == 'undefined' ) {
+							$('#action').html( "<span style='font-family: \"Syncopate\"'>pulsar</span> extension is needed to enjoy this content<br><a id='installer-link' href='javascript:undefined'>install extension</a>" );
+							$('#installer-link').click( function(){ chrome.webstore.install() } );
+						} else if ( reply < '0.3.0' ) {
+							$('#action').html( "you need to update your <span style='font-family: \"Syncopate\"'>pulsar</span> extension to enjoy this content" );
+						} else if ( reply >= '0.3.0' ) {
+							$('#action').html( "<a id='launcher-link' href='javascript:undefined'>start</a>" );
+							$('#launcher-link').click( function(){ document.location = 'chrome-extension://' + extensionId + '/custom-launcher.html?config=' + configURL } );
+						}
+					});
+				}
+
+			})
+			.fail( function() {
+				$('#logo').html( 'pulsar' );
+				$('#action').html( 'this launcher needs a publicly accessible configuration file' );
+			});
+	</script>
+</html>
