@@ -159,7 +159,7 @@
 					chrome.runtime.sendMessage(extensionId, { message: 'getPulsarVersion' }, function ( reply ) {
 						if ( typeof reply == 'undefined' ) {
 							$('#action').html( "<span style='font-family: \"Syncopate\"'>pulsar</span> extension is needed to enjoy this content<br><a id='installer-link' href='javascript:undefined'>install extension</a>" );
-							$('#installer-link').click( function(){ chrome.webstore.install() } );
+							$('#installer-link').click( function(){ chrome.webstore.install( undefined, function(){ location.reload() }, function(){ location.reload() } ) } );
 						} else if ( reply < '0.3.0' ) {
 							$('#action').html( "you need to update your <span style='font-family: \"Syncopate\"'>pulsar</span> extension to enjoy this content" );
 						} else if ( reply >= '0.3.0' ) {
