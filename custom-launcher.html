@@ -71,6 +71,10 @@
 				color: grey;
 			}
 			
+			#logo img {
+				width: 80%;
+			}
+			
 			#powered {
 				position: fixed;
 				bottom: 0px;
@@ -149,7 +153,7 @@
 			dataType: 'json' } )
 			.done( function( configuration ) {
 				document.title = configuration.title;
-				$('#logo').html( '<img src=\'' + configuration.logo + '\' style=\'width: ' + configuration.logo_width + '\'></div>' );
+				$('#logo').html( '<img src=\'' + configuration.logo + '\'></div>' );
 
 				var isChrome = !!window.chrome && !!window.chrome.webstore;
 		
@@ -158,12 +162,12 @@
 				} else {
 					chrome.runtime.sendMessage(extensionId, { message: 'getPulsarVersion' }, function ( reply ) {
 						if ( typeof reply == 'undefined' ) {
-							$('#action').html( "<span style='font-family: \"Syncopate\"'>pulsar</span> extension is needed to enjoy this content<br><a id='installer-link' href='#'>install extension</a>" );
-							$('#installer-link').click( function(){ chrome.webstore.install( undefined, function(){ location.reload() }, function(){ location.reload() } ) } );
+							$('#action').html( "<span style='font-family: \"Syncopate\"'>pulsar</span> extension is needed to enjoy this content<br><a id='installer-link' href='javascript:undefined'>install extension</a>" );
+							$('#installer-link').click( function(){ chrome.webstore.install( undefined, function(){ location.reload() }, function(){ document.location = 'https://chrome.google.com/webstore/detail/pulsar/dcbdlfomknhejkfnidjpadgopfaeppgf' } ) } );
 						} else if ( reply < '0.3.0' ) {
 							$('#action').html( "you need to update your <span style='font-family: \"Syncopate\"'>pulsar</span> extension to enjoy this content" );
 						} else if ( reply >= '0.3.0' ) {
-							$('#action').html( "<a id='launcher-link' href='#'>start</a>" );
+							$('#action').html( "<a id='launcher-link' href='javascript:undefined'>start</a>" );
 							$('#launcher-link').click( function(){ document.location = 'chrome-extension://' + extensionId + '/custom-launcher.html?config=' + configURL } );
 						}
 					});
